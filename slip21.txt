@@ -1,0 +1,127 @@
+slip-21
+1.
+import java.util.LinkedList;
+import java.util.Iterator;
+import java.util.Scanner;
+
+public class SubjectList {
+    
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        LinkedList<String> subjectList = new LinkedList<>();
+        
+        System.out.print("Enter the number of subjects: ");
+        int n = scanner.nextInt();
+        
+        for (int i = 0; i < n; i++) {
+            System.out.print("Enter subject " + (i+1) + ": ");
+            String subject = scanner.next();
+            subjectList.add(subject);
+        }
+        
+        System.out.println("Subjects entered:");
+        Iterator<String> iterator = subjectList.iterator();
+        while (iterator.hasNext()) {
+            String subject = iterator.next();
+            System.out.println(subject);
+        }
+    }
+}
+
+2.
+class shop {
+    int material;
+    boolean flag = false;
+
+    public synchronized int get() 
+    {
+        while (flag == false) 
+        {
+            try {
+                wait();
+            } catch (Exception e)
+             {
+                e.getStackTrace();
+            }
+        } 
+        flag = false;
+        notify();
+        return material;
+    }
+
+    public synchronized void put(int value)
+     {
+        while (flag == true) 
+        {
+            try {
+                wait();
+            } catch (Exception e) 
+            {
+                e.getStackTrace();
+            } 
+        } 
+        material = value;
+        flag = true;
+        notify();
+    }
+}
+
+class Consumer extends Thread 
+{
+    shop sh;
+    int no;
+
+    public Consumer(shop shp, int no) 
+    {
+        sh = shp;
+        this.no = no;
+    }
+
+    public void run() {
+        int value = 0;
+        for (int i = 0; i < 10; i++)
+         {
+            value = sh.get();
+            System.out.println("Consumer #" + this.no + " got: " + value);
+        }
+    }
+}
+
+class Producer extends Thread
+ {
+    shop sh;
+    int no;
+
+    public Producer(shop s, int no) 
+    {
+        sh = s;
+        this.no = no;
+    }
+
+    public void run() {
+        for (int i = 0; i < 10; i++) 
+        {
+            sh.put(i);
+            System.out.println("Producer #" + this.no + " put: " + i);
+            try {
+                sleep((int) (Math.random() * 1000));
+            } catch (Exception e) {
+                e.getStackTrace();
+            }
+        } 
+    }
+}
+
+public class A3 {
+    public static void main(String[] args) 
+    {
+        shop s = new shop();
+        Producer p = new Producer(s, 1);
+        Consumer c = new Consumer(s, 1);
+
+        p.start();
+        c.start();
+    }
+}
+
+
